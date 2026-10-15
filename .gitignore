@@ -1,0 +1,16 @@
+# segredos
+.env
+*.env
+
+# dados baixados pelo Plano B (vão para o Volume, não para o git)
+volume/
+*.dbc
+*.dbf
+*.parquet
+
+# Python / IDE
+__pycache__/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+.DS_Store
