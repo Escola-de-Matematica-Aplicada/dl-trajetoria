@@ -24,7 +24,7 @@ O notebook entrega cerca de **70% do caminho pronto**. As células marcadas com 
 | Caminho | O que é |
 |---|---|
 | `notebooks/oficina_sim_temporal.ipynb` | o roteiro-guia: rode e complete no Databricks |
-| `scripts/baixar_datasus.py` | Plano B: baixa os arquivos fora do Databricks, se o FTP estiver bloqueado |
+| `scripts/baixar_datasus.py` | Plano B: baixa os arquivos fora do Databricks, se o FTP do DATASUS falhar |
 
 ## Como começar no Databricks Free Edition
 
@@ -36,9 +36,9 @@ O notebook entrega cerca de **70% do caminho pronto**. As células marcadas com 
 
 > **Cota do Free Edition.** O modo `completo` baixa ~2,5 GB do SIM e ~5 GB do SIH. Rode-o **uma vez**, depois de validar tudo no `rapido`.
 
-## Plano B: o Databricks não acessa o FTP do DATASUS
+## Plano B: o FTP do DATASUS falhou
 
-O serverless do Free Edition só acessa um conjunto restrito de destinos na internet. Se a seção 2 do notebook mostrar falhas de download:
+O serverless do Free Edition acessa o FTP do DATASUS, e o notebook baixa tudo direto de lá. O FTP do DATASUS, porém, às vezes fica lento ou fora do ar. Se a seção 2 do notebook mostrar falhas de download mesmo depois de tentar de novo:
 
 ```bash
 python3 scripts/baixar_datasus.py --modo rapido        # ou --modo completo
