@@ -6,6 +6,8 @@ Artigos e trabalhos citados no notebook `oficina_sim_temporal.ipynb`.
 
 | Arquivo | Onde entra no notebook |
 |---|---|
+| `datasus/IT_SIHSUS_1603.pdf` — DATASUS, layout da AIH reduzida (FTP `SIHSUS/200801_/Doc/`) | 1.3 — dicionário do SIH (TODO 1.1) |
+| `microdatasus/processa_sih.py`, `microdatasus/processa_sim.py` — tradução para Python de `process_sih.R` e `process_sim.R` (SALDANHA, R., pacote microdatasus; licença MIT em `microdatasus/LICENSE.md`) | 1.3 — significado dos códigos (ex.: `CODIGOS["IDENT"]`) |
 | `anonimizacao/TCC-Gerardo-Mikael.pdf` — PEREIRA, G. M. C. (TCC EMAp, 2025) | 3.6 — k-anonimato na publicação |
 | `grafos/TCC - Yonathan Rabinovici Gherman.pdf` — GHERMAN, Y. R. (TCC EMAp, 2025) | 3.7 — grafo temporal com o ano como entidade |
 
