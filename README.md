@@ -71,3 +71,4 @@ Exporte o notebook executado no modo `completo` (**File → Export → IPython N
 - DATASUS — FTP público: `ftp://ftp.datasus.gov.br/dissemin/publicos/` (`SIM/CID10/DORES`, `SIM/PRELIM/DORES`, `SIHSUS/200801_/dados`)
 - SALDANHA, R. — microdatasus: [`process_sim.R`](https://github.com/rfsaldanha/microdatasus/blob/master/R/process_sim.R), [`process_sih.R`](https://github.com/rfsaldanha/microdatasus/blob/master/R/process_sih.R); livro [*sis*](https://rfsaldanha.github.io/sis/sim.html)
 - DATASUS — [CID-10](http://www2.datasus.gov.br/cid10/V2008/cid10.htm)
+- Artigos e trabalhos citados (TCCs EMAp) e links do Jev e do `ai_decide`: pasta [`referencias/`](referencias/README.md)
