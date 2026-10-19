@@ -55,12 +55,17 @@ O script usa só a biblioteca padrão do Python 3.
 
 ## Jev (opcional, seção 4.6)
 
-A seção 4.6 usa o Jev (TypeSafe System One) para criar um novo atributo na `dim_cid`. A chave da API **nunca** vai no notebook. Guarde-a num *secret scope*:
+A seção 4.6 usa o Jev (TypeSafe System One) para criar um novo atributo na `dim_cid`. A chave da API **nunca** vai numa célula: guarde-a num *secret scope*. Os comandos abaixo são da **CLI do Databricks** (versão 0.205 ou mais nova) e rodam num **terminal** (Codespaces ou seu computador), não no notebook:
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh   # instala a CLI
+databricks auth login --host https://<seu-workspace>.cloud.databricks.com              # login pelo navegador
 databricks secrets create-scope typesafe
-databricks secrets put-secret typesafe api_key
+databricks secrets put-secret typesafe api_key        # pede a chave (de https://console.typesafe.ai/)
+databricks secrets list-secrets typesafe              # confere: deve listar api_key
 ```
+
+O passo a passo completo, com Windows e macOS, está no início da seção 4.6 do notebook. Sem a chave, a 4.6 é pulada com um aviso.
 
 ## Entrega (D2L)
 
