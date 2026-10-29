@@ -1,9 +1,10 @@
 """Plano B da oficina: baixa os arquivos do DATASUS fora do Databricks.
 
-Use quando o compute serverless do Databricks Free não conseguir acessar o FTP do DATASUS.
+Use quando o notebook não conseguir baixar nem do FTP do DATASUS nem do espelho da turma.
 Rode no seu computador ou no Codespaces e envie a pasta gerada para o Volume:
 
-    python3 scripts/baixar_datasus.py --modo rapido
+    python3 scripts/baixar_datasus.py --modo rapido                  # do FTP do DATASUS
+    python3 scripts/baixar_datasus.py --modo rapido --fonte github   # do espelho da turma (HTTPS)
     databricks fs cp -r volume/ dbfs:/Volumes/workspace/oficina_sus/bronze_raw/
 
 (ou, pela interface: Catalog → workspace → oficina_sus → Volumes → bronze_raw → Upload,
@@ -11,10 +12,12 @@ Rode no seu computador ou no Codespaces e envie a pasta gerada para o Volume:
 
 As listas de UFs, anos e meses são as mesmas da célula CONFIG do notebook.
 """
-import argparse, os, shutil, urllib.request
+import argparse, os, shutil, tarfile, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 FTP = "ftp://ftp.datasus.gov.br/dissemin/publicos"
+# Espelho da turma: os mesmos .dbc brutos, em pacotes {sistema}_{UF}.tar (release dados-2026.2)
+ESPELHO = "https://github.com/Escola-de-Matematica-Aplicada/dl-trajetoria/releases/download/dados-2026.2"
 TODAS_UFS = ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA",
              "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"]
 MODOS = {
@@ -53,12 +56,42 @@ def baixar(url, destino):
         return f"FALHOU ({e})"
 
 
+def do_espelho(pacote, faltam, saida):
+    "Extrai de `pacote` (ex.: sih_AC.tar) só os caminhos em `faltam` (ex.: dbc/sih/RDAC0801.dbc)."
+    feitos = []
+    try:
+        with urllib.request.urlopen(f"{ESPELHO}/{pacote}", timeout=300) as r, \
+             tarfile.open(fileobj=r, mode="r|") as tar:
+            for m in tar:
+                if m.name in faltam:
+                    destino = os.path.join(saida, m.name)
+                    os.makedirs(os.path.dirname(destino), exist_ok=True)
+                    with tar.extractfile(m) as src, open(destino + ".part", "wb") as f:
+                        shutil.copyfileobj(src, f, 1 << 20)
+                    os.replace(destino + ".part", destino)
+                    feitos.append(m.name)
+    except Exception as e:
+        print(f"  ✗ espelho {pacote}: {e}")
+    return feitos
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--modo", choices=MODOS, default="rapido")
     ap.add_argument("--saida", default="volume", help="pasta local que espelha o Volume bronze_raw")
+    ap.add_argument("--fonte", choices=["ftp", "github"], default="ftp",
+                    help="ftp: DATASUS · github: espelho da turma (mesmos arquivos, por HTTPS)")
     a = ap.parse_args()
     lista = list(tarefas(MODOS[a.modo]))
+    if a.fonte == "github":
+        lista = [(f"{ESPELHO}/CID10CSV.zip", d) if d.startswith("cid/") else (u, d) for u, d in lista]
+        pacotes = {}
+        for _, d in lista:
+            if d.startswith("dbc/") and not os.path.exists(os.path.join(a.saida, d)):
+                sistema, nome = d.split("/")[1:]
+                pacotes.setdefault(f"{sistema}_{nome[2:4]}.tar", set()).add(d)
+        with ThreadPoolExecutor(4) as ex:
+            list(ex.map(lambda p: do_espelho(p, pacotes[p], a.saida), sorted(pacotes)))
     with ThreadPoolExecutor(4) as ex:
         res = list(ex.map(lambda t: (t[1], baixar(t[0], os.path.join(a.saida, t[1]))), lista))
     falhas = [r for r in res if r[1].startswith("FALHOU")]

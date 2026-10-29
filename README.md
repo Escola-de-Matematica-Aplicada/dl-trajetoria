@@ -24,7 +24,9 @@ O notebook entrega cerca de **70% do caminho pronto**. As células marcadas com 
 | Caminho | O que é |
 |---|---|
 | `notebooks/oficina_sim_temporal.ipynb` | o roteiro-guia: rode e complete no Databricks |
-| `scripts/baixar_datasus.py` | Plano B: baixa os arquivos fora do Databricks, se o FTP do DATASUS falhar |
+| `scripts/baixar_datasus.py` | Plano B: baixa os arquivos fora do Databricks (do FTP ou do espelho da turma) |
+| `dados/MANIFEST.sha256` | sha256 dos 2.755 arquivos brutos do modo `completo` (confira com `sha256sum -c --ignore-missing`) |
+| [release `dados-2026.2`](https://github.com/Escola-de-Matematica-Aplicada/dl-trajetoria/releases/tag/dados-2026.2) | espelho da turma: os `.dbc` brutos do modo `completo`, intactos, um `.tar` por sistema e UF + `MANIFEST.sha256` |
 
 ## Como começar no Databricks Free Edition
 
@@ -36,22 +38,32 @@ O notebook entrega cerca de **70% do caminho pronto**. As células marcadas com 
 
 > **Cota do Free Edition.** O modo `completo` baixa ~2,5 GB do SIM e ~5 GB do SIH. Rode-o **uma vez**, depois de validar tudo no `rapido`.
 
-## Plano B: o FTP do DATASUS falhou
+## O FTP do DATASUS falhou? Use o espelho da turma
 
-O serverless do Free Edition acessa o FTP do DATASUS, e o notebook baixa tudo direto de lá. O FTP do DATASUS, porém, às vezes fica lento ou fora do ar. Se a seção 2 do notebook mostrar falhas de download mesmo depois de tentar de novo:
+O DATASUS publica por FTP. Em alguns workspaces do Free Edition o serverless não alcança esse FTP, e mesmo quando alcança ele às vezes fica lento ou fora do ar. Por isso todos os arquivos do modo `completo` (coleta de 29/10/2026) estão também na release [**`dados-2026.2`**](https://github.com/Escola-de-Matematica-Aplicada/dl-trajetoria/releases/tag/dados-2026.2), por HTTPS, **exatamente como vieram do FTP**: os mesmos `.dbc` comprimidos, agrupados em `sim_{UF}.tar`, `sim_prelim_{UF}.tar` e `sih_{UF}.tar`, mais `CID10CSV.zip` e `MANIFEST.sha256`.
+
+Na célula **CONFIG** do notebook:
+
+| `FONTE` | Comportamento |
+|---|---|
+| `"ftp"` (padrão) | baixa do DATASUS; o que falhar é buscado **automaticamente** no espelho |
+| `"github"` | vai direto ao espelho; use se o Checkpoint 1 (seção 1.2) não conseguir listar o FTP |
+
+Os `.dbc` caem no mesmo lugar do Volume (`dbc/sim`, `dbc/sih`, `dbc/sim_prelim`, `cid`) e o resto do notebook não muda.
+
+### Último recurso: baixar fora do Databricks
 
 ```bash
-python3 scripts/baixar_datasus.py --modo rapido        # ou --modo completo
+python3 scripts/baixar_datasus.py --modo rapido                   # do FTP do DATASUS
+python3 scripts/baixar_datasus.py --modo rapido --fonte github    # do espelho da turma
 ```
 
-Isso cria a pasta `volume/` com a mesma estrutura do Volume do notebook (`dbc/sim`, `dbc/sih`, `dbc/sim_prelim`, `cid`). Envie-a para o Volume:
+Isso cria a pasta `volume/` com a mesma estrutura do Volume do notebook. Envie-a para o Volume:
 
 - pela interface: **Catalog → workspace → oficina_sus → Volumes → bronze_raw → Upload to this volume**, mantendo as subpastas; ou
 - pela CLI do Databricks: `databricks fs cp -r volume/ dbfs:/Volumes/workspace/oficina_sus/bronze_raw/`
 
-Depois rode a seção 2 do notebook de novo: os arquivos já presentes não são baixados outra vez.
-
-O script usa só a biblioteca padrão do Python 3.
+Depois rode a seção 2 do notebook de novo: os arquivos já presentes não são baixados outra vez. O script usa só a biblioteca padrão do Python 3.
 
 ## Jev (opcional, seção 4.6)
 
@@ -73,7 +85,7 @@ Exporte o notebook executado no modo `completo` (**File → Export → IPython N
 
 ## Referências
 
-- DATASUS — FTP público: `ftp://ftp.datasus.gov.br/dissemin/publicos/` (`SIM/CID10/DORES`, `SIM/PRELIM/DORES`, `SIHSUS/200801_/dados`)
+- DATASUS — FTP público: `ftp://ftp.datasus.gov.br/dissemin/publicos/` (`SIM/CID10/DORES`, `SIM/PRELIM/DORES`, `SIHSUS/200801_/dados`); espelho: release [`dados-2026.2`](https://github.com/Escola-de-Matematica-Aplicada/dl-trajetoria/releases/tag/dados-2026.2)
 - SALDANHA, R. — microdatasus: [`process_sim.R`](https://github.com/rfsaldanha/microdatasus/blob/master/R/process_sim.R), [`process_sih.R`](https://github.com/rfsaldanha/microdatasus/blob/master/R/process_sih.R); livro [*sis*](https://rfsaldanha.github.io/sis/sim.html)
 - DATASUS — [CID-10](http://www2.datasus.gov.br/cid10/V2008/cid10.htm)
 - Artigos e trabalhos citados (TCCs EMAp) e links do Jev e do `ai_decide`: pasta [`referencias/`](referencias/README.md)
