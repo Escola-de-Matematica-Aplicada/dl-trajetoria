@@ -34,28 +34,28 @@ O notebook entrega cerca de **70% do caminho pronto**. As células marcadas com 
 2. **Workspace → Create → Git folder** e cole a URL deste repositório. (Se preferir: baixe `notebooks/oficina_sim_temporal.ipynb` e use **Workspace → Import → File**.)
 3. Abra `notebooks/oficina_sim_temporal.ipynb` e conecte ao compute **Serverless**.
 4. Rode as células de cima para baixo, primeiro com `MODO = "rapido"` (3 UFs, poucos anos, alguns minutos).
-5. Quando tudo funcionar, mude para `MODO = "completo"` e rode de novo. Só o que falta é baixado.
+5. Quando tudo funcionar, mude para `MODO = "completo"` e rode de novo. Só o que falta é baixado (do espelho da turma; veja abaixo).
 
 > **Cota do Free Edition.** O modo `completo` baixa ~2,5 GB do SIM e ~5 GB do SIH. Rode-o **uma vez**, depois de validar tudo no `rapido`.
 
-## O FTP do DATASUS falhou? Use o espelho da turma
+## De onde vêm os dados: o espelho da turma
 
-O DATASUS publica por FTP. Em alguns workspaces do Free Edition o serverless não alcança esse FTP, e mesmo quando alcança ele às vezes fica lento ou fora do ar. Por isso todos os arquivos do modo `completo` (coleta de 29/10/2026) estão também na release [**`dados-2026.2`**](https://github.com/Escola-de-Matematica-Aplicada/dl-trajetoria/releases/tag/dados-2026.2), por HTTPS, **exatamente como vieram do FTP**: os mesmos `.dbc` comprimidos, agrupados em `sim_{UF}.tar`, `sim_prelim_{UF}.tar` e `sih_{UF}.tar`, mais `CID10CSV.zip` e `MANIFEST.sha256`.
+O DATASUS publica por FTP, mas em alguns workspaces do Free Edition o serverless não alcança esse FTP, e mesmo quando alcança ele às vezes fica lento ou fora do ar. Por isso o notebook baixa, por padrão, do **espelho da turma**: a release [**`dados-2026.2`**](https://github.com/Escola-de-Matematica-Aplicada/dl-trajetoria/releases/tag/dados-2026.2), por HTTPS, com os arquivos do modo `completo` (coleta de 29/10/2026) **exatamente como vieram do FTP**: os mesmos `.dbc` comprimidos, agrupados em `sim_{UF}.tar`, `sim_prelim_{UF}.tar` e `sih_{UF}.tar`, mais `CID10CSV.zip` e `MANIFEST.sha256`.
 
 Na célula **CONFIG** do notebook:
 
 | `FONTE` | Comportamento |
 |---|---|
-| `"ftp"` (padrão) | baixa do DATASUS; o que falhar é buscado **automaticamente** no espelho |
-| `"github"` | vai direto ao espelho; use se o Checkpoint 1 (seção 1.2) não conseguir listar o FTP |
+| `"github"` (padrão) | baixa do espelho da turma |
+| `"ftp"` | baixa direto do DATASUS; o que falhar é buscado **automaticamente** no espelho |
 
-Os `.dbc` caem no mesmo lugar do Volume (`dbc/sim`, `dbc/sih`, `dbc/sim_prelim`, `cid`) e o resto do notebook não muda.
+Os `.dbc` caem no mesmo lugar do Volume (`dbc/sim`, `dbc/sih`, `dbc/sim_prelim`, `cid`).
 
 ### Último recurso: baixar fora do Databricks
 
 ```bash
-python3 scripts/baixar_datasus.py --modo rapido                   # do FTP do DATASUS
-python3 scripts/baixar_datasus.py --modo rapido --fonte github    # do espelho da turma
+python3 scripts/baixar_datasus.py --modo rapido                   # do espelho da turma
+python3 scripts/baixar_datasus.py --modo rapido --fonte ftp       # direto do FTP do DATASUS
 ```
 
 Isso cria a pasta `volume/` com a mesma estrutura do Volume do notebook. Envie-a para o Volume:

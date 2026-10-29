@@ -3,8 +3,8 @@
 Use quando o notebook não conseguir baixar nem do FTP do DATASUS nem do espelho da turma.
 Rode no seu computador ou no Codespaces e envie a pasta gerada para o Volume:
 
-    python3 scripts/baixar_datasus.py --modo rapido                  # do FTP do DATASUS
-    python3 scripts/baixar_datasus.py --modo rapido --fonte github   # do espelho da turma (HTTPS)
+    python3 scripts/baixar_datasus.py --modo rapido                  # do espelho da turma (HTTPS)
+    python3 scripts/baixar_datasus.py --modo rapido --fonte ftp      # direto do FTP do DATASUS
     databricks fs cp -r volume/ dbfs:/Volumes/workspace/oficina_sus/bronze_raw/
 
 (ou, pela interface: Catalog → workspace → oficina_sus → Volumes → bronze_raw → Upload,
@@ -79,8 +79,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--modo", choices=MODOS, default="rapido")
     ap.add_argument("--saida", default="volume", help="pasta local que espelha o Volume bronze_raw")
-    ap.add_argument("--fonte", choices=["ftp", "github"], default="ftp",
-                    help="ftp: DATASUS · github: espelho da turma (mesmos arquivos, por HTTPS)")
+    ap.add_argument("--fonte", choices=["github", "ftp"], default="github",
+                    help="github: espelho da turma (padrão, por HTTPS) · ftp: direto do DATASUS")
     a = ap.parse_args()
     lista = list(tarefas(MODOS[a.modo]))
     if a.fonte == "github":
