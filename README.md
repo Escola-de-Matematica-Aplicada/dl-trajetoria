@@ -17,6 +17,8 @@ Você vai percorrer a jornada básica de engenharia de dados:
 | 3 | **Prep** | `silver_*`, `dim_cid`, `gold_fato_causa`, `gold_lideres` |
 | 4 | **Analyze** | doença líder por UF × ano, mapas, leitura temporal, robustez |
 
+**Linguagens:** Python com Spark só na etapa 2, para baixar os arquivos e gerar as tabelas `bronze_*`. Da etapa 3 em diante, tudo é **SQL** (células `%sql`); o Python volta só para desenhar o mapa e chamar o Jev.
+
 O notebook entrega cerca de **70% do caminho pronto**. As células marcadas com **🧩 SUA VEZ** são os outros 30%: é com elas que você trabalha.
 
 ## Conteúdo
